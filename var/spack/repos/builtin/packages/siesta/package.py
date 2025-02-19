@@ -23,6 +23,13 @@ class Siesta(MakefilePackage, CMakePackage):
     homepage = "https://departments.icmab.es/leem/siesta/"
     git = "https://gitlab.com/siesta-project/siesta"
 
+
+    version(
+        "5.2.2",
+        url="https://gitlab.com/siesta-project/siesta/-/archive/5.2.2/siesta-5.2.2.tar.gz",
+        sha256="9890c6d3a653bd64efbd2f5042fb16c3de9b18fe60b5c0860a15377527c5505a",
+    )
+
     version(
         "5.0.1",
         url="https://gitlab.com/siesta-project/siesta/-/archive/5.0.1/siesta-5.0.1.tar.gz",
@@ -63,6 +70,7 @@ class Siesta(MakefilePackage, CMakePackage):
     variant("elpa", default=False, description="Use ELPA")
     variant("mumps", default=False, description="Compile with support for MUMPS solvers")
     variant("pexsi", default=False, description="Compile with PEXSI")
+    variant('flook', default=False,  description='Use flook')
     variant(
         "cray",
         default=False,
@@ -83,6 +91,7 @@ class Siesta(MakefilePackage, CMakePackage):
     depends_on("scalapack", when="+mpi")
     depends_on("netcdf-c")
     depends_on("netcdf-fortran")
+    depends_on("readline")
     depends_on("cray-libsci+openmp", when="^[virtuals=cray-libsci] cray-libsci")
     depends_on("metis@5:", when="+metis")
     depends_on("elpa", when="+elpa")
@@ -304,5 +313,8 @@ class CMakeBuilder(cmake.CMakeBuilder):
         if "+metis" in spec:
             args += ["-DSIESTA__METIS=ON"]
             args += ["-DSIESTA_LINKER_FLAGS=-L{0} -lmetis".format(self.spec["metis"].prefix.lib)]
+
+        if "+flook" in spec:
+            args += ["-DSIESTA_WITH_FLOOK=ON"]
 
         return args
