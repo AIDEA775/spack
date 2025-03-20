@@ -71,6 +71,7 @@ class Siesta(MakefilePackage, CMakePackage):
     variant("mumps", default=False, description="Compile with support for MUMPS solvers")
     variant("pexsi", default=False, description="Compile with PEXSI")
     variant('flook', default=False,  description='Use flook')
+    variant('libxc', default=False,  description='Use libxc')
     variant(
         "cray",
         default=False,
@@ -97,6 +98,7 @@ class Siesta(MakefilePackage, CMakePackage):
     depends_on("elpa", when="+elpa")
     depends_on("mumps", when="+mumps")
     depends_on("pexsi", when="+pexsi")
+    depends_on("libxc", when="+libxc")
 
     with when("build_system=cmake"):
         depends_on("cmake@3.20:", type="build")
@@ -316,5 +318,9 @@ class CMakeBuilder(cmake.CMakeBuilder):
 
         if "+flook" in spec:
             args += ["-DSIESTA_WITH_FLOOK=ON"]
+
+        if "+libxc" in spec:
+            args += ["-DSIESTA_WITH_LIBXC=ON"]
+            args += ["-DSIESTA_LINKER_FLAGS=-L{0} -lxc".format(self.spec["libxc"].prefix.lib)]
 
         return args
